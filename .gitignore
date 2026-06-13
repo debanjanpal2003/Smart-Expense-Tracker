@@ -1,0 +1,34 @@
+# Flutter-related
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Android-related
+android/**/gradle-wrapper.jar
+android/.gradle/
+android/app/local.properties
+android/app/generated_signing_config.properties
+android/app/google-services.json
+android/local.properties
+android/key.properties
+
+# iOS-related
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/Flutter.podspec
+ios/Pods/
+ios/Runner.xcworkspace/xcuserdata/
+
+# Symbols and logs
+*.utils.log
+*.jks
+*.keystore
+*.apk
+*.aab
+
+# VS Code
+.vscode/

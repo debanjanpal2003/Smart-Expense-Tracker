@@ -25,7 +25,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _completeOnboarding() async {
     final user = UserModel(
-      id: const Uuid().v4(),
+      id: Uuid().v4(),
       name: _nameController.text,
       email: _emailController.text,
       currency: _selectedCurrency,

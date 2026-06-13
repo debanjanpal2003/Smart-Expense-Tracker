@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../repositories/nlp_parser.dart';
+import 'nlp_parser.dart';
 import '../../transactions/repositories/transaction_repository.dart';
 import '../../models/app_models.dart';
 

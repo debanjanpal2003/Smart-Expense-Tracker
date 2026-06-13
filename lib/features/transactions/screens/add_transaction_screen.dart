@@ -25,7 +25,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   void _saveTransaction() async {
     if (_formKey.currentState!.validate()) {
       final transaction = TransactionModel(
-        id: const Uuid().v4(),
+        id: Uuid().v4(),
         title: _titleController.text,
         amount: double.parse(_amountController.text),
         date: _selectedDate,

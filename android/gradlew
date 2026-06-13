@@ -1,9 +1,18 @@
 #!/usr/bin/env sh
 
-#
-# Gradle startup script for POSIX systems
-#
+# Minimal gradlew for CI
+if [ -n "$JAVA_HOME" ] ; then
+    JAVACMD="$JAVA_HOME/bin/java"
+else
+    JAVACMD="java"
+fi
 
-# ... (Standard Gradlew Script)
-# I will provide a simplified version that works for Flutter builds
-exec "$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar" "$@"
+if [ ! -x "$JAVACMD" ] ; then
+    echo "Error: JAVA_HOME is not defined correctly." >&2
+    exit 1
+fi
+
+APP_HOME=$(dirname "$0")
+CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+
+exec "$JAVACMD" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"

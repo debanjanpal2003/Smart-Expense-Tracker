@@ -1,5 +1,5 @@
 import '../../analytics/stats_engine.dart';
-import '../../models/app_models.dart';
+import '../../../models/app_models.dart';
 
 class AnomalyDetector {
   static List<TransactionModel> detectByIQR(List<TransactionModel> transactions) {

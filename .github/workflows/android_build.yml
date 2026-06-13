@@ -6,28 +6,29 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
     - uses: actions/checkout@v4
-
+    
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-
+        
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
         flutter-version: '3.22.2'
         channel: 'stable'
-
-    - name: Clean and Generate Android Infrastructure
+        
+    - name: Generate Android Infrastructure
       run: |
         rm -rf android
         flutter create --org com.example --project-name smat_expense_tracker --platforms android .
@@ -36,7 +37,7 @@ jobs:
         
     - name: Install dependencies
       run: flutter pub get
-
+      
     - name: Build APK
       run: flutter build apk --release --verbose
       

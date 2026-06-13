@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../auth/repositories/auth_repository.dart';
-import '../../auth/screens/onboarding_screen.dart';
+import '../auth/repositories/auth_repository.dart';
+import '../auth/screens/onboarding_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});

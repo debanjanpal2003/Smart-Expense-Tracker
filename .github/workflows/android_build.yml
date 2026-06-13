@@ -9,16 +9,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up JDK 11
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'temurin'
         
     - name: Set up Flutter
@@ -29,13 +27,11 @@ jobs:
         
     - name: Install dependencies
       run: flutter pub get
-      
-    # Skipping analyze and test temporarily to ensure APK builds
-    # - name: Run Analyze
-    #   run: flutter analyze
-      
-    # - name: Run Tests
-    #   run: flutter test
+
+    - name: Create local.properties
+      run: |
+        echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
+        echo "flutter.sdk=$FLUTTER_HOME" >> android/local.properties
       
     - name: Build APK
       run: flutter build apk --release

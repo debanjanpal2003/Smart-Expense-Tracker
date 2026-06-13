@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import '../../core/storage/storage_service.dart';
-import '../../models/app_models.dart';
+import '../../../core/storage/storage_service.dart';
+import '../../../models/app_models.dart';
 
 class AuthRepository {
   final StorageService _storage = StorageService();

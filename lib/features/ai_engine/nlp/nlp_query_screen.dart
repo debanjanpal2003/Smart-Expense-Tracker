@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'nlp_parser.dart';
-import '../../transactions/repositories/transaction_repository.dart';
-import '../../../models/app_models.dart';
+import '../../../transactions/repositories/transaction_repository.dart';
+import '../../../../models/app_models.dart';
 
 class NLPQueryScreen extends StatefulWidget {
   const NLPQueryScreen({super.key});

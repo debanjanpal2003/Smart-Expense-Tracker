@@ -27,13 +27,14 @@ jobs:
         flutter-version: '3.22.0'
         channel: 'stable'
         
-    - name: Install dependencies
-      run: flutter pub get
-
-    - name: Create local.properties
+    - name: Generate Android Infrastructure
       run: |
+        flutter create --org com.example --project-name smat_expense_tracker --platforms android .
         echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
         echo "flutter.sdk=$FLUTTER_HOME" >> android/local.properties
+        
+    - name: Install dependencies
+      run: flutter pub get
       
     - name: Build APK
       run: flutter build apk --release --verbose

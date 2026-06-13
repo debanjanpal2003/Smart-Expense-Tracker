@@ -5,9 +5,12 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
     - uses: actions/checkout@v4
@@ -28,6 +31,8 @@ jobs:
       run: |
         rm -rf android
         flutter create --org com.example --project-name smat_expense_tracker --platforms android .
+        echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
+        echo "flutter.sdk=$FLUTTER_HOME" >> android/local.properties
         
     - name: Install dependencies
       run: flutter pub get

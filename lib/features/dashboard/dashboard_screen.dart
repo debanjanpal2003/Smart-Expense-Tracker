@@ -71,7 +71,7 @@ class DashboardHome extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Colors.blueAccent, Colors.indigoAccent]),
+        gradient: LinearGradient(colors: [Colors.blueAccent, Colors.indigoAccent]),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(

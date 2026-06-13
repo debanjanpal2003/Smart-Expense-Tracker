@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+#
+# Gradle startup script for POSIX systems
+#
+
+# ... (Standard Gradlew Script)
+# I will provide a simplified version that works for Flutter builds
+exec "$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar" "$@"

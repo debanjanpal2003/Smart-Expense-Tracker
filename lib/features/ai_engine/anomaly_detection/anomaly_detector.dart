@@ -1,4 +1,4 @@
-import '../analytics/stats_engine.dart';
+import '../../analytics/stats_engine.dart';
 import '../../models/app_models.dart';
 
 class AnomalyDetector {

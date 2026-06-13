@@ -29,6 +29,7 @@ jobs:
         
     - name: Generate Android Infrastructure
       run: |
+        rm -rf android
         flutter create --org com.example --project-name smat_expense_tracker --platforms android .
         echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
         echo "flutter.sdk=$FLUTTER_HOME" >> android/local.properties

@@ -43,6 +43,7 @@ dependencies:
   # Logic & Serialization
   json_annotation: ^4.8.1
   crypto: ^3.0.3
+  uuid: ^3.0.7
 
 dev_dependencies:
   flutter_test:

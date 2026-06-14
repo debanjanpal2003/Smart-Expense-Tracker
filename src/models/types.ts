@@ -4,8 +4,9 @@ export interface Category {
   id: string;
   name: string;
   icon?: string;
-  color?: number;
+  color?: string; // Changed to string for Hex support
   type: EntryType;
+  isCustom?: boolean;
 }
 
 export interface Transaction {
@@ -13,6 +14,7 @@ export interface Transaction {
   title: string;
   amount: number;
   date: Date;
+  time: string; // Added time
   categoryId: string;
   note?: string;
   type: EntryType;
@@ -27,10 +29,22 @@ export interface Budget {
   endDate: Date;
 }
 
-export interface User {
+export interface UserProfile {
   id: string;
   name: string;
   email: string;
+  passwordHash?: string; // For local auth
   currency: string;
   trackIncome: boolean;
+  onboardingComplete: boolean;
+  createdAt: Date;
+}
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'warning' | 'info' | 'success';
+  date: Date;
+  isRead: boolean;
 }

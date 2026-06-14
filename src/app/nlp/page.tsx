@@ -54,69 +54,80 @@ export default function NLPQuery() {
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '800px', margin: '0 auto', paddingBottom: '40px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-        <div style={{ background: 'var(--primary)', padding: '12px', borderRadius: '16px', color: 'white' }}>
+        <div style={{ background: 'var(--primary)', padding: '12px', borderRadius: '16px', color: 'white', flexShrink: 0 }}>
           <BrainCircuit size={32} />
         </div>
         <div>
-          <h2 style={{ margin: 0 }}>AI Insights Assistant</h2>
-          <p style={{ color: 'var(--secondary)', margin: 0 }}>Ask anything about your finances in plain English.</p>
+          <h2 style={{ margin: 0, fontSize: '20px' }}>AI Assistant</h2>
+          <p style={{ color: 'var(--secondary)', margin: 0, fontSize: '14px' }}>Analyze your data in plain English.</p>
         </div>
       </div>
 
-      <form onSubmit={handleQuery} style={{ position: 'relative', marginBottom: '40px' }}>
+      <form onSubmit={handleQuery} style={{ position: 'relative', marginBottom: '32px' }}>
         <input 
           type="text" 
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder="e.g. 'Give financial health score' or 'Find unusual expenses'"
-          style={{ width: '100%', padding: '20px 60px 20px 24px', borderRadius: '20px', border: '2px solid var(--border)', fontSize: '18px', outline: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+          placeholder="e.g. 'Financial health score'"
+          style={{ width: '100%', padding: '16px 54px 16px 20px', borderRadius: '15px', border: '2px solid var(--border)', fontSize: '16px', outline: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
         />
-        <button type="submit" style={{ position: 'absolute', right: '12px', top: '12px', background: 'var(--primary)', color: 'white', padding: '10px', borderRadius: '12px' }}>
-          <Send size={24} />
+        <button type="submit" style={{ position: 'absolute', right: '8px', top: '8px', background: 'var(--primary)', color: 'white', padding: '10px', borderRadius: '10px' }}>
+          <Send size={20} />
         </button>
       </form>
 
-      {loading && <div style={{ textAlign: 'center', color: 'var(--secondary)' }}>Analyzing your data...</div>}
+      {loading && <div style={{ textAlign: 'center', color: 'var(--secondary)', fontSize: '14px' }}>Analyzing data...</div>}
 
       {result && (
-        <div style={{ background: 'white', padding: '32px', borderRadius: 'var(--radius)', border: '1px solid var(--border)', animation: 'slideUp 0.3s ease-out' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', marginBottom: '16px', fontWeight: 600 }}>
-            <Sparkles size={18} /> AI Response
+        <div style={{ background: 'white', padding: '24px', borderRadius: 'var(--radius)', border: '1px solid var(--border)', animation: 'slideUp 0.3s ease-out' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', marginBottom: '16px', fontWeight: 600, fontSize: '14px' }}>
+            <Sparkles size={16} /> AI Insights
           </div>
           
-          <h3 style={{ marginBottom: '12px' }}>{result.summary}</h3>
+          <h3 style={{ marginBottom: '16px', fontSize: '18px', lineHeight: '1.4' }}>{result.summary}</h3>
           
           {result.parsed.intent === 'financial_health' && (
-            <div style={{ marginBottom: '24px' }}>
+            <div style={{ marginBottom: '16px' }}>
               <div style={{ fontSize: '48px', fontWeight: 800, color: result.value > 70 ? 'var(--income)' : 'var(--expense)' }}>
                 {result.value.toFixed(0)}
               </div>
-              <p style={{ color: 'var(--secondary)', marginTop: '12px', padding: '16px', background: 'var(--accent)', borderRadius: '12px' }}>
-                <strong>Recommendation:</strong> {result.recommendation}
+              <p style={{ color: 'var(--secondary)', marginTop: '12px', padding: '16px', background: 'var(--accent)', borderRadius: '12px', fontSize: '14px' }}>
+                <strong>Note:</strong> {result.recommendation}
               </p>
             </div>
           )}
 
           {result.data && result.data.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {result.data.slice(0, 5).map((t: any) => (
-                <div key={t.id} style={{ padding: '12px', border: '1px solid var(--border)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                  <span>{t.title}</span>
-                  <span style={{ fontWeight: 600, color: 'var(--expense)' }}>-${t.amount}</span>
+                <div key={t.id} style={{ padding: '12px', background: 'var(--accent)', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 500 }}>{t.title}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--expense)', fontSize: '14px' }}>-${t.amount.toFixed(2)}</span>
                 </div>
               ))}
-              {result.data.length > 5 && <div style={{ fontSize: '12px', color: 'var(--secondary)', textAlign: 'center' }}>+ {result.data.length - 5} more</div>}
+              {result.data.length > 5 && <div style={{ fontSize: '12px', color: 'var(--secondary)', textAlign: 'center', marginTop: '4px' }}>+ {result.data.length - 5} others found</div>}
             </div>
           )}
 
           {!loading && result.parsed.intent === 'unknown' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--secondary)', background: 'var(--accent)', padding: '16px', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--secondary)', background: 'var(--accent)', padding: '16px', borderRadius: '12px', fontSize: '14px' }}>
               <AlertCircle size={20} />
-              <span>Try queries like "food expenses above 500" or "show spending trend"</span>
+              <span>Try queries like "food expenses above 500" or "financial health score"</span>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Suggested Queries */}
+      {!result && !loading && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+          {['Financial health score', 'Unusual expenses', 'Food above 100'].map(q => (
+            <button key={q} onClick={() => setQuery(q)} style={{ padding: '8px 16px', borderRadius: '20px', background: 'white', border: '1px solid var(--border)', fontSize: '13px', color: 'var(--secondary)' }}>
+              {q}
+            </button>
+          ))}
         </div>
       )}
     </div>

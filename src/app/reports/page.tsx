@@ -6,7 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   AreaChart, Area
 } from 'recharts';
-import { Download, FileSpreadsheet, FileText, Sparkles } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Sparkles, TrendingDown, PieChart as PieIcon } from 'lucide-react';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -16,6 +16,7 @@ export default function Reports() {
   const [data, setData] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [recommendations, setRecommendations] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
@@ -44,15 +45,20 @@ export default function Reports() {
       setData(Object.values(monthlyData));
       
       const recs = [];
-      const topExpense = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0];
-      if (topExpense) recs.push(`Your highest spending is on ${topExpense[0]}. Consider reducing it by 10%.`);
+      const sortedCats = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+      if (sortedCats.length > 0) {
+        recs.push(`You spend the most on items in this category. Try to reduce it.`);
+      }
       
       const totalIncome = txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
       const totalExpense = txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
-      if (totalExpense > totalIncome * 0.8) recs.push("You're spending more than 80% of your income. Look for savings opportunities.");
-      if (recs.length === 0) recs.push("You're doing great! Keep tracking to see long-term trends.");
+      
+      if (totalExpense > totalIncome && totalIncome > 0) {
+        recs.push("Your expenses exceed your income. Consider reviewing your budget.");
+      }
       
       setRecommendations(recs);
+      setLoading(false);
     }
     loadData();
   }, []);
@@ -62,7 +68,7 @@ export default function Reports() {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'transactions_export.csv';
+    link.download = 'smat_expense_export.csv';
     link.click();
   };
 
@@ -78,78 +84,88 @@ export default function Reports() {
     doc.text('SmatExpense Financial Report', 14, 15);
     doc.autoTable({
       startY: 25,
-      head: [['Title', 'Amount', 'Type', 'Category', 'Date']],
-      body: transactions.map(t => [t.title, t.amount, t.type, t.categoryId, new Date(t.date).toLocaleDateString()]),
+      head: [['Title', 'Amount', 'Type', 'Date']],
+      body: transactions.map(t => [t.title, t.amount, t.type, new Date(t.date).toLocaleDateString()]),
     });
     doc.save('smat_expense_report.pdf');
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-        <h2 style={{ margin: 0 }}>Analytics & Reports</h2>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button onClick={exportCSV} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 15px', borderRadius: '12px', background: 'white', border: '1px solid var(--border)', fontWeight: 600 }}>
-            <Download size={18} /> CSV
+    <div style={{ maxWidth: '100%', overflowX: 'hidden' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
+        <h2 style={{ margin: 0 }}>Analytics</h2>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button onClick={exportCSV} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 12px', borderRadius: '10px', background: 'white', border: '1px solid var(--border)', fontWeight: 600, fontSize: '13px' }}>
+            <Download size={16} /> CSV
           </button>
-          <button onClick={exportExcel} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 15px', borderRadius: '12px', background: 'white', border: '1px solid var(--border)', fontWeight: 600 }}>
-            <FileSpreadsheet size={18} /> Excel
+          <button onClick={exportExcel} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 12px', borderRadius: '10px', background: 'white', border: '1px solid var(--border)', fontWeight: 600, fontSize: '13px' }}>
+            <FileSpreadsheet size={16} /> Excel
           </button>
-          <button onClick={exportPDF} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 15px', borderRadius: '12px', background: 'var(--primary)', color: 'white', fontWeight: 600 }}>
-            <FileText size={18} /> PDF
+          <button onClick={exportPDF} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 12px', borderRadius: '10px', background: 'var(--primary)', color: 'white', fontWeight: 600, fontSize: '13px' }}>
+            <FileText size={16} /> PDF
           </button>
         </div>
       </div>
 
-      <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', padding: '24px', borderRadius: 'var(--radius)', color: 'white', marginBottom: '32px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-          <Sparkles size={24} />
-          <h3 style={{ margin: 0 }}>Smart Recommendations</h3>
+      {recommendations.length > 0 && (
+        <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', padding: '20px', borderRadius: 'var(--radius)', color: 'white', marginBottom: '32px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+            <Sparkles size={20} />
+            <h3 style={{ margin: 0, fontSize: '16px' }}>Insights</h3>
+          </div>
+          <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '14px' }}>
+            {recommendations.map((r, i) => <li key={i} style={{ marginBottom: '6px' }}>{r}</li>)}
+          </ul>
         </div>
-        <ul style={{ margin: 0, paddingLeft: '24px' }}>
-          {recommendations.map((r, i) => <li key={i} style={{ marginBottom: '8px' }}>{r}</li>)}
-        </ul>
-      </div>
+      )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '24px' }}>
-        <div style={{ background: 'white', padding: '24px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-          <h3 style={{ marginBottom: '24px' }}>Income vs Expenses</h3>
-          <div style={{ height: '350px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 500px), 1fr))', gap: '24px' }}>
+        <div style={{ background: 'white', padding: '20px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+          <h3 style={{ marginBottom: '24px', fontSize: '18px' }}>Income vs Expenses</h3>
+          <div style={{ height: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                <Tooltip cursor={{fill: '#f1f5f9'}} contentStyle={{borderRadius: '12px', border: 'none'}} />
-                <Legend iconType="circle" />
-                <Bar dataKey="income" name="Income" fill="var(--income)" radius={[4, 4, 0, 0]} barSize={20} />
-                <Bar dataKey="expense" name="Expense" fill="var(--expense)" radius={[4, 4, 0, 0]} barSize={20} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11}} />
+                <Tooltip cursor={{fill: '#f1f5f9'}} contentStyle={{borderRadius: '12px', border: 'none', fontSize: '13px'}} />
+                <Legend iconType="circle" wrapperStyle={{fontSize: '12px'}} />
+                <Bar dataKey="income" name="Income" fill="var(--income)" radius={[4, 4, 0, 0]} barSize={15} />
+                <Bar dataKey="expense" name="Expense" fill="var(--expense)" radius={[4, 4, 0, 0]} barSize={15} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div style={{ background: 'white', padding: '24px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-          <h3 style={{ marginBottom: '24px' }}>Savings Trend</h3>
-          <div style={{ height: '350px' }}>
+        <div style={{ background: 'white', padding: '20px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+          <h3 style={{ marginBottom: '24px', fontSize: '18px' }}>Monthly Savings</h3>
+          <div style={{ height: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data.map(d => ({ ...d, savings: d.income - d.expense }))}>
                 <defs>
-                  <linearGradient id="colorSavings" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="colorSavingsRep" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2}/>
                     <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                <Tooltip contentStyle={{borderRadius: '12px', border: 'none'}} />
-                <Area type="monotone" dataKey="savings" name="Savings" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorSavings)" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11}} />
+                <Tooltip contentStyle={{borderRadius: '12px', border: 'none', fontSize: '13px'}} />
+                <Area type="monotone" dataKey="savings" name="Savings" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorSavingsRep)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
+
+      {data.length === 0 && !loading && (
+        <div style={{ textAlign: 'center', color: 'var(--secondary)', padding: '80px', background: 'white', borderRadius: 'var(--radius)', border: '1px solid var(--border)', marginTop: '24px' }}>
+          <TrendingDown size={48} style={{ marginBottom: '16px', opacity: 0.3, margin: '0 auto 16px' }} />
+          <h3 style={{ margin: 0, fontSize: '18px' }}>Not Enough Data</h3>
+          <p style={{ marginTop: '8px' }}>Add some transactions to see your financial analytics.</p>
+        </div>
+      )}
     </div>
   );
 }

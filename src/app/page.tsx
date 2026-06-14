@@ -23,13 +23,17 @@ export default function Dashboard() {
     avgDailySpend: 0,
     budgetUtilization: 0
   });
+  const [budgetCount, setBudgetCount] = useState(0);
   const [catData, setCatData] = useState<any[]>([]);
   const [trendData, setTrendData] = useState<any[]>([]);
 
   useEffect(() => {
     async function loadData() {
-      const txs = await db.transactions.toArray();
-      const cats = await db.categories.toArray();
+      const [txs, cats, budgets] = await Promise.all([
+        db.transactions.toArray(),
+        db.categories.toArray(),
+        db.budgets.toArray()
+      ]);
       
       let income = 0;
       let expenses = 0;
@@ -49,14 +53,28 @@ export default function Dashboard() {
 
       // Calculate Widgets
       const daysCount = Object.keys(dailyTotals).length || 1;
+      
+      // Budget utilization: average of all active budgets
+      let avgUtilization = 0;
+      if (budgets.length > 0) {
+        const totalUtilization = budgets.reduce((sum, b) => {
+          const spent = txs
+            .filter(tx => tx.categoryId === b.categoryId && tx.type === 'expense')
+            .reduce((s, tx) => s + tx.amount, 0);
+          return sum + (spent / b.amount);
+        }, 0);
+        avgUtilization = (totalUtilization / budgets.length) * 100;
+      }
+
       setSummary({
         totalBalance: income - expenses,
         totalIncome: income,
         totalExpenses: expenses,
         netSavings: income > 0 ? ((income - expenses) / income) * 100 : 0,
         avgDailySpend: expenses / daysCount,
-        budgetUtilization: 65 // Mock for now until Budget module is active
+        budgetUtilization: Math.min(100, avgUtilization)
       });
+      setBudgetCount(budgets.length);
 
       // Category Data
       const pieData = Object.entries(categoryTotals).map(([catId, amount]) => {
@@ -88,46 +106,48 @@ export default function Dashboard() {
         <div style={{ background: color + '15', padding: '10px', borderRadius: '12px', color: color }}>
           <Icon size={24} />
         </div>
-        <div style={{ fontSize: '12px', color: 'var(--secondary)', fontWeight: 600 }}>{subtext}</div>
+        <div style={{ fontSize: '11px', color: 'var(--secondary)', fontWeight: 600, textAlign: 'right' }}>{subtext}</div>
       </div>
       <div>
-        <div style={{ fontSize: '14px', color: 'var(--secondary)', marginBottom: '4px' }}>{title}</div>
-        <div style={{ fontSize: '24px', fontWeight: 700 }}>{value}</div>
+        <div style={{ fontSize: '13px', color: 'var(--secondary)', marginBottom: '4px' }}>{title}</div>
+        <div style={{ fontSize: '20px', fontWeight: 700 }}>{value}</div>
       </div>
     </div>
   );
 
+  const currencySymbol = profile?.currency === 'INR' ? '₹' : '$';
+
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+    <div style={{ paddingBottom: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h2 style={{ margin: 0 }}>Good Morning, {profile?.name || 'User'}!</h2>
-          <p style={{ color: 'var(--secondary)', margin: 0 }}>Here's your financial summary for today.</p>
+          <h2 style={{ margin: 0, fontSize: 'clamp(20px, 5vw, 28px)' }}>Hi, {profile?.name || 'User'}!</h2>
+          <p style={{ color: 'var(--secondary)', margin: 0 }}>Here's your summary.</p>
         </div>
         <button style={{ background: 'var(--accent)', padding: '10px 20px', borderRadius: '12px', color: 'var(--primary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Calendar size={18} /> This Month
         </button>
       </div>
       
-      {/* 6 Widgets Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-        <Widget title="Total Balance" value={`${profile?.currency === 'INR' ? '₹' : '$'}${summary.totalBalance.toLocaleString()}`} icon={Wallet} color="#2563eb" subtext="Available" />
-        <Widget title="Total Income" value={`${profile?.currency === 'INR' ? '₹' : '$'}${summary.totalIncome.toLocaleString()}`} icon={ArrowUpCircle} color="#22c55e" subtext="+12% vs last month" />
-        <Widget title="Total Expenses" value={`${profile?.currency === 'INR' ? '₹' : '$'}${summary.totalExpenses.toLocaleString()}`} icon={ArrowDownCircle} color="#ef4444" subtext="-5% vs last month" />
-        <Widget title="Net Savings" value={`${summary.netSavings.toFixed(1)}%`} icon={TrendingUp} color="#8b5cf6" subtext="of total income" />
-        <Widget title="Daily Avg" value={`${profile?.currency === 'INR' ? '₹' : '$'}${summary.avgDailySpend.toLocaleString()}`} icon={Activity} color="#f59e0b" subtext="Last 30 days" />
-        <Widget title="Budget Used" value={`${summary.budgetUtilization}%`} icon={Target} color="#ec4899" subtext="4 active budgets" />
+      {/* 6 Widgets Grid - Improved responsiveness */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px', marginBottom: '40px' }}>
+        <Widget title="Total Balance" value={`${currencySymbol}${summary.totalBalance.toLocaleString()}`} icon={Wallet} color="#2563eb" subtext="Available" />
+        <Widget title="Total Income" value={`${currencySymbol}${summary.totalIncome.toLocaleString()}`} icon={ArrowUpCircle} color="#22c55e" subtext="All time" />
+        <Widget title="Total Expenses" value={`${currencySymbol}${summary.totalExpenses.toLocaleString()}`} icon={ArrowDownCircle} color="#ef4444" subtext="All time" />
+        <Widget title="Net Savings" value={`${summary.netSavings.toFixed(1)}%`} icon={TrendingUp} color="#8b5cf6" subtext="of income" />
+        <Widget title="Daily Avg" value={`${currencySymbol}${summary.avgDailySpend.toLocaleString()}`} icon={Activity} color="#f59e0b" subtext="Last 30 days" />
+        <Widget title="Budget Used" value={`${summary.budgetUtilization.toFixed(0)}%`} icon={Target} color="#ec4899" subtext={`${budgetCount} active`} />
       </div>
 
       {/* Charts Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginBottom: '40px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '40px' }}>
         {/* Spending Trend */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+        <div style={{ background: 'white', padding: '20px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <h3 style={{ margin: 0 }}>Spending Trend</h3>
+            <h3 style={{ margin: 0, fontSize: '18px' }}>Spending Trend</h3>
             <PieIcon size={20} color="var(--secondary)" />
           </div>
-          <div style={{ height: '300px' }}>
+          <div style={{ height: '280px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trendData}>
                 <defs>
@@ -137,8 +157,8 @@ export default function Dashboard() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 11}} />
                 <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
                 <Area type="monotone" dataKey="amount" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorAmt)" />
               </AreaChart>
@@ -147,15 +167,15 @@ export default function Dashboard() {
         </div>
 
         {/* Category Distribution */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-          <h3 style={{ marginBottom: '24px' }}>Category Distribution</h3>
-          <div style={{ height: '300px' }}>
+        <div style={{ background: 'white', padding: '20px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+          <h3 style={{ marginBottom: '24px', fontSize: '18px' }}>Categories</h3>
+          <div style={{ height: '280px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={catData}
-                  innerRadius={80}
-                  outerRadius={110}
+                  innerRadius={60}
+                  outerRadius={90}
                   paddingAngle={8}
                   dataKey="value"
                 >
@@ -164,7 +184,7 @@ export default function Dashboard() {
                   ))}
                 </Pie>
                 <Tooltip />
-                <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
+                <Legend iconType="circle" wrapperStyle={{fontSize: '12px', paddingTop: '10px'}} />
               </PieChart>
             </ResponsiveContainer>
           </div>

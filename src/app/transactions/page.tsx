@@ -90,84 +90,84 @@ export default function Transactions() {
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+    <div style={{ maxWidth: '100%', overflowX: 'hidden' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
         <h2 style={{ margin: 0 }}>Transactions</h2>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <input type="file" ref={fileInputRef} onChange={handleImportCSV} style={{ display: 'none' }} accept=".csv" />
-          <button onClick={() => fileInputRef.current?.click()} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '8px', background: 'white', border: '1px solid var(--border)', fontWeight: 600 }}>
-            <Upload size={18} /> Import CSV
+          <button onClick={() => fileInputRef.current?.click()} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', borderRadius: '10px', background: 'white', border: '1px solid var(--border)', fontWeight: 600, fontSize: '14px' }}>
+            <Upload size={18} /> Import
           </button>
           {selectedIds.length > 0 && (
-            <button onClick={handleDeleteSelected} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '8px', background: 'var(--expense)', color: 'white', fontWeight: 600 }}>
+            <button onClick={handleDeleteSelected} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', borderRadius: '10px', background: 'var(--expense)', color: 'white', fontWeight: 600, fontSize: '14px' }}>
               <Trash2 size={18} /> Delete ({selectedIds.length})
             </button>
           )}
         </div>
       </div>
 
-      {/* Toolbar */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '24px', background: 'white', padding: '20px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-        <div style={{ flex: 1, minWidth: '240px', position: 'relative' }}>
+      {/* Toolbar - Optimized for mobile */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '24px', background: 'white', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+        <div style={{ flex: '1 1 100%', position: 'relative' }}>
           <Search size={18} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--secondary)' }} />
           <input 
             type="text" 
-            placeholder="Search transactions..." 
+            placeholder="Search..." 
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ width: '100%', padding: '10px 10px 10px 40px', borderRadius: '8px', border: '1px solid var(--border)' }}
+            style={{ width: '100%', padding: '10px 10px 10px 40px', borderRadius: '10px', border: '1px solid var(--border)', fontSize: '15px' }}
           />
         </div>
         
-        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value as any)} style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-          <option value="all">All Types</option>
-          <option value="income">Income</option>
-          <option value="expense">Expense</option>
-        </select>
+        <div style={{ display: 'flex', gap: '8px', flex: '1 1 100%', overflowX: 'auto', paddingBottom: '4px' }}>
+          <select value={typeFilter} onChange={e => setTypeFilter(e.target.value as any)} style={{ padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--border)', background: 'white', fontSize: '14px', minWidth: '110px' }}>
+            <option value="all">All Types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
 
-        <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-          <option value="all">All Categories</option>
-          {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+          <select value={catFilter} onChange={e => setCatFilter(e.target.value)} style={{ padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--border)', background: 'white', fontSize: '14px', minWidth: '130px' }}>
+            <option value="all">All Categories</option>
+            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
 
-        <button onClick={() => setSortOrder(o => o === 'asc' ? 'desc' : 'asc')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', background: 'white' }}>
-          <ArrowUpDown size={18} /> {sortOrder.toUpperCase()}
-        </button>
+          <button onClick={() => setSortOrder(o => o === 'asc' ? 'desc' : 'asc')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--border)', background: 'white', fontSize: '14px', whiteSpace: 'nowrap' }}>
+            <ArrowUpDown size={16} /> {sortOrder.toUpperCase()}
+          </button>
+        </div>
       </div>
 
       {/* List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {filteredTransactions.map(t => {
           const cat = categories.find(c => c.id === t.categoryId);
           const isSelected = selectedIds.includes(t.id);
           return (
             <div key={t.id} style={{ 
               background: isSelected ? 'var(--accent)' : 'white', 
-              padding: '16px', 
+              padding: '12px', 
               borderRadius: 'var(--radius)', 
               border: `1px solid ${isSelected ? 'var(--primary)' : 'var(--border)'}`, 
               display: 'flex', 
               alignItems: 'center', 
-              gap: '16px',
+              gap: '12px',
               transition: 'all 0.2s'
             }}>
-              <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(t.id)} />
+              <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(t.id)} style={{ width: '18px', height: '18px' }} />
               
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: (cat?.color || '#eee') + '22', display: 'flex', justifyContent: 'center', alignItems: 'center', color: cat?.color }}>
-                {cat?.name?.[0] || '?'}
+              <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: (cat?.color || '#eee') + '22', display: 'flex', justifyContent: 'center', alignItems: 'center', color: cat?.color, flexShrink: 0 }}>
+                <span style={{ fontWeight: 700, fontSize: '14px' }}>{cat?.name?.[0] || '?'}</span>
               </div>
 
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600 }}>{t.title}</div>
-                <div style={{ fontSize: '14px', color: 'var(--secondary)' }}>
-                  {new Date(t.date).toLocaleDateString()} • {t.time} • {cat?.name}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: '15px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.title}</div>
+                <div style={{ fontSize: '12px', color: 'var(--secondary)' }}>
+                  {new Date(t.date).toLocaleDateString()} • {t.time}
                 </div>
               </div>
 
-              {t.note && <div title={t.note} style={{ color: 'var(--secondary)', padding: '8px', cursor: 'help' }}><ChevronDown size={16} /></div>}
-
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontWeight: 700, color: t.type === 'income' ? 'var(--income)' : 'var(--expense)' }}>
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: '15px', color: t.type === 'income' ? 'var(--income)' : 'var(--expense)' }}>
                   {t.type === 'income' ? '+' : '-'}${t.amount.toFixed(2)}
                 </div>
               </div>
@@ -179,8 +179,8 @@ export default function Transactions() {
 
         {filteredTransactions.length === 0 && !loading && (
           <div style={{ textAlign: 'center', color: 'var(--secondary)', padding: '60px', background: 'white', borderRadius: 'var(--radius)', border: '1px dashed var(--border)' }}>
-            <Filter size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
-            <div>No transactions match your filters</div>
+            <Filter size={40} style={{ marginBottom: '16px', opacity: 0.5 }} />
+            <div style={{ fontSize: '15px' }}>No transactions found</div>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 export interface NLPResult {
   intent: string;
-  entities: Record<string, any>;
+  entities: Record<string, unknown>;
 }
 
 export class NLPParser {

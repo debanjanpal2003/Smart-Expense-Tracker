@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '@/core/database/db';
-import { Transaction, Category } from '@/models/types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { ArrowUpCircle, ArrowDownCircle, Wallet } from 'lucide-react';
 
+interface ChartDataItem {
+  name: string;
+  value: number;
+}
+
 export default function Dashboard() {
   const [summary, setSummary] = useState({ totalBalance: 0, totalIncome: 0, totalExpenses: 0 });
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<ChartDataItem[]>([]);
 
   useEffect(() => {
     async function loadData() {

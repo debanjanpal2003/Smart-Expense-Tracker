@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+# Minimal gradlew for CI
+if [ -n "$JAVA_HOME" ] ; then
+    JAVACMD="$JAVA_HOME/bin/java"
+else
+    JAVACMD="java"
+fi
+
+if [ ! -x "$JAVACMD" ] ; then
+    echo "Error: JAVA_HOME is not defined correctly." >&2
+    exit 1
+fi
+
+APP_HOME=$(dirname "$0")
+CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+
+exec "$JAVACMD" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"

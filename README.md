@@ -1,82 +1,36 @@
-# SmartExpense Tracker - Offline AI Finance Assistant
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A complete, production-ready, fully offline Android application built with Flutter.
+## Getting Started
 
-## Features
+First, run the development server:
 
-- **100% Offline**: No internet, no cloud, no external APIs. Everything stays on your device.
-- **Local AI Engines**:
-  - **Stats Engine**: Mean, Median, StdDev, and Percentiles.
-  - **Anomaly Detection**: IQR and Z-Score based detectors for unusual spending.
-  - **Forecasting**: Linear Regression and Moving Averages for future spending predictions.
-  - **NLP Query Parser**: Rule-based natural language interaction (e.g., "food expenses > 500").
-- **Secure Authentication**: Offline registration, password hashing (SHA-256), and Biometric/PIN lock.
-- **Transaction Management**: Full CRUD with search, filtering, and sorting.
-- **Advanced Visualizations**: Interactive Pie, Bar, and Line charts using `fl_chart`.
-- **Report Generation**: Export data to PDF, Excel (XLSX), and CSV.
-- **Material 3 Design**: Modern Fintech UI with Glassmorphism and Dark Mode support.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## Tech Stack
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- **Framework**: Flutter 3.x
-- **State Management**: Riverpod
-- **Local Database**: SQLite (`sqflite`)
-- **Key-Value Storage**: Hive
-- **Secure Storage**: `flutter_secure_storage`
-- **Charts**: `fl_chart`
-- **PDF/Excel/CSV**: `pdf`, `excel`, `csv`
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## How to Run
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-### Prerequisites
-1.  **Install Flutter SDK**: [Flutter Installation Guide](https://docs.flutter.dev/get-started/install)
-2.  **Java Development Kit (JDK)**: Required for Android builds (JDK 11 recommended).
-3.  **Android Studio**: For Android SDK and Emulator setup.
+## Learn More
 
-### Steps to Run
-1.  **Clone the repository**.
-2.  **Install Dependencies**:
-    ```bash
-    flutter pub get
-    ```
-3.  **Run Code Generation** (if applicable):
-    ```bash
-    flutter pub run build_runner build
-    ```
-4.  **Run the App**:
-    Connect an Android device or start an emulator, then run:
-    ```bash
-    flutter run
-    ```
+To learn more about Next.js, take a look at the following resources:
 
-## How to Build APK
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-To generate a production-ready release APK:
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-1.  **Clean the project**:
-    ```bash
-    flutter clean
-    ```
-2.  **Build Release APK**:
-    ```bash
-    flutter build apk --release
-    ```
-    The APK will be located at: `build/app/outputs/flutter-apk/app-release.apk`
+## Deploy on Vercel
 
-3.  **Build App Bundle (AAB)**:
-    ```bash
-    flutter build appbundle --release
-    ```
-    The AAB will be located at: `build/app/outputs/bundle/release/app-release.aab`
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## Project Structure
-
-- `lib/core/`: Foundational services (DB, Storage, Theme).
-- `lib/features/`: Modular features (Auth, Dashboard, AI Engine, Reports).
-- `lib/models/`: Shared data models.
-- `lib/widgets/`: Reusable UI components.
-- `.github/workflows/`: CI/CD automation.
-
-## Security Note
-
-All data is stored locally in the application's private directory. If the application is uninstalled, all data is automatically deleted by the Android system.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
